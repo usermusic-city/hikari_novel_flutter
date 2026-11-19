@@ -31,7 +31,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          version: "3.24.0"
+          flutter-version: "3.50.0"
 
       - name: Flutter Pub Get
         run: flutter pub get
@@ -41,6 +41,7 @@ jobs:
           flutter build apk \
             --release \
             --target-platform android-arm64 \
+            --android-skip-build-dependency-validation \
             --build-name=hikari_novel \
             --build-number=${{ github.run_number }}
 
