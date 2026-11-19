@@ -1,5 +1,52 @@
-# 提交到 main
-git checkout main
-git add .github/workflows/build-arm64.yml
-git commit -m "ci: flutter android arm64 build"
-git push origin main
+name: Flutter Android ARM64 Build
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - dev
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-arm64:
+    name: Build APK (armeabi-v8a)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          version: "3.24.0"
+
+      - name: Flutter Pub Get
+        run: flutter pub get
+
+      - name: Build APK (android-arm64)
+        run: |
+          flutter build apk \
+            --release \
+            --target-platform android-arm64 \
+            --build-name=hikari_novel \
+            --build-number=${{ github.run_number }}
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hikari_novel-arm64-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
